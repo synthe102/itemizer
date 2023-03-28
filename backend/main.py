@@ -143,14 +143,14 @@ def read_users(users: Annotated[list[schemas.User], Depends(get_users)], current
     return users
 
 
-@ app.get("/users/me/", response_model=schemas.User)
+@app.get("/users/me/", response_model=schemas.User)
 async def read_users_me(
     current_user: Annotated[schemas.User, Depends(get_current_active_user)]
 ):
     return current_user
 
 
-@ app.get("/users/me/items/")
+@app.get("/users/me/items/")
 async def read_own_items(
     current_user: Annotated[schemas.User, Depends(get_current_active_user)]
 ):
