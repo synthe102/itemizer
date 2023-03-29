@@ -20,17 +20,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "disabled": False,
-    }
-}
-
-
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -154,15 +143,15 @@ def read_users(users: Annotated[list[schemas.User], Depends(get_users)], current
     return users
 
 
-@ app.get("/users/me/", response_model=schemas.User)
+@app.get("/users/me/", response_model=schemas.User)
 async def read_users_me(
     current_user: Annotated[schemas.User, Depends(get_current_active_user)]
 ):
     return current_user
 
 
-@ app.get("/users/me/items/")
+@app.get("/users/me/items/")
 async def read_own_items(
     current_user: Annotated[schemas.User, Depends(get_current_active_user)]
 ):
-    return [{"item_id": current_user.items, "owner": current_user.username}]
+    return current_user.items
