@@ -154,4 +154,4 @@ async def read_users_me(
 async def read_own_items(
     current_user: Annotated[schemas.User, Depends(get_current_active_user)]
 ):
-    return [{"item_id": "Foo", "owner": current_user.username}]
+    return current_user.items
