@@ -9,6 +9,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from . import crud, models, schemas
+from .crud import get_items
 from .database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
@@ -19,6 +20,15 @@ SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+fake_users_db = {
+    "johndoe": {
+        "username": "johndoe",
+        "full_name": "John Doe",
+        "email": "johndoe@example.com",
+        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
+        "disabled": False,
+    }
+}
 
 class Token(BaseModel):
     access_token: str
@@ -99,7 +109,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
 
 
 async def get_current_active_user(
-    current_user: Annotated[schemas.User, Depends(get_current_user)]
+        current_user: Annotated[schemas.User, Depends(get_current_user)]
 ):
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
@@ -108,8 +118,8 @@ async def get_current_active_user(
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Session = Depends(get_db)
+        form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+        db: Session = Depends(get_db)
 ):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
@@ -139,19 +149,22 @@ def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 
 @app.get("/users/", response_model=list[schemas.User])
-def read_users(users: Annotated[list[schemas.User], Depends(get_users)], current_user: models.User = Depends(get_current_active_user)):
+def read_users(users: Annotated[list[schemas.User], Depends(get_users)],
+               current_user: models.User = Depends(get_current_active_user)):
     return users
 
 
 @app.get("/users/me/", response_model=schemas.User)
 async def read_users_me(
-    current_user: Annotated[schemas.User, Depends(get_current_active_user)]
+        current_user: Annotated[schemas.User, Depends(get_current_active_user)]
 ):
     return current_user
 
 
 @app.get("/users/me/items/")
 async def read_own_items(
-    current_user: Annotated[schemas.User, Depends(get_current_active_user)]
+        current_user: Annotated[schemas.User, Depends(get_current_active_user)]
 ):
-    return current_user.items
+
+    return [{"item_id": current_user.items, "owner": current_user.username}]
+
