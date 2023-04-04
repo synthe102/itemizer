@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    image: synthe102/itemizer
+    ports:
+      - 8000:80
+  database:
+    image: postgres:15-bullseye
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: itemizer

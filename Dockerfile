@@ -3,6 +3,8 @@ FROM python:3.11
 EXPOSE 80
 WORKDIR /app
 
+RUN apt update -y && apt install -y libpq-dev
+
 RUN mkdir -p ./storage
 COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
