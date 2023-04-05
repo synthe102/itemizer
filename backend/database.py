@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 #SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 SQLALCHEMY_DATABASE_URL = "postgresql://postgres:admin@localhost/itemizer"
 
+
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={}
 )
